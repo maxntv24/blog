@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Blog of MaxNTV(aka vu.nguyen)</title>
-    <link>https://blog.maxntv.com/posts/</link>
+    <link>http://localhost:1313/posts/</link>
     <description>Recent content in Posts on Blog of MaxNTV(aka vu.nguyen)</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 28 Aug 2024 09:44:31 +0700</lastBuildDate>
-    <atom:link href="https://blog.maxntv.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How I Got My First Bug Bounty (650$ for CVE-2024-6636)</title>
-      <link>https://blog.maxntv.com/posts/post-1/cve-2024-6636/</link>
+      <link>http://localhost:1313/posts/post-1/cve-2024-6636/</link>
       <pubDate>Wed, 28 Aug 2024 09:44:31 +0700</pubDate>
-      <guid>https://blog.maxntv.com/posts/post-1/cve-2024-6636/</guid>
+      <guid>http://localhost:1313/posts/post-1/cve-2024-6636/</guid>
       <description>Introduction One day, an anonymous brother asked me, &amp;ldquo;Are you interested in finding WordPress bugs?&amp;rdquo; And that&amp;rsquo;s how this CVE came to be.&#xA;The &amp;ldquo;WooCommerce - Social Login&amp;rdquo; plugin for WordPress at version &amp;lt;= 2.7.3 is vulnerable to the ability to create new users with an &amp;ldquo;Administrator&amp;rdquo; role. Specifically, if the register function is enabled. In that case, the newly created user will have the default role(Subscriber), but any user without authentication(unauthenticated) can change this default role to any value including &amp;ldquo;Administrator&amp;rdquo;.</description>
     </item>
   </channel>
