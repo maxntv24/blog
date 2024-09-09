@@ -6,28 +6,35 @@
     <description>Recent content on Blog of MaxNTV(aka vu.nguyen)</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Aug 2024 09:44:31 +0700</lastBuildDate>
+    <lastBuildDate>Fri, 06 Sep 2024 20:34:00 +0700</lastBuildDate>
     <atom:link href="https://blog.maxntv.com/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Just use Dirsearch to get Critical Bug</title>
+      <link>https://blog.maxntv.com/posts/post-2/svn/</link>
+      <pubDate>Fri, 06 Sep 2024 20:34:00 +0700</pubDate>
+      <guid>https://blog.maxntv.com/posts/post-2/svn/</guid>
+      <description>&lt;h2 id=&#34;discovered-the-vulnerability&#34;&gt;Discovered the Vulnerability&lt;/h2&gt;&#xA;&lt;p&gt;As a normal days, I used &amp;ldquo;Dirsearch&amp;rdquo; to scan directory of a target from a bug bounty program, I found a directory is &amp;ldquo;.svn/wc.db&amp;rdquo;.&#xA;&lt;img src=&#34;../image1.png&#34; alt=&#34;alt text&#34;&gt;&#xA;At first I didn&amp;rsquo;t know what file this was so I asked my younger brother(aka CuongN) and he said svn like git also is version control system.&lt;/p&gt;&#xA;&lt;p&gt;After read some blog, i know that:&lt;/p&gt;&#xA;&lt;p&gt;In SVN (Subversion), the wc.db file is part of the internal structure of a Subversion working copy. It is a SQLite database that stores metadata related to the working copy, such as information about file versions, status, properties, and the relationship between the working copy and the repository.&#xA;&lt;img src=&#34;../image2.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;</description>
+    </item>
     <item>
       <title>How I Got My First Bug Bounty (650$ for CVE-2024-6636)</title>
       <link>https://blog.maxntv.com/posts/post-1/cve-2024-6636/</link>
       <pubDate>Wed, 28 Aug 2024 09:44:31 +0700</pubDate>
       <guid>https://blog.maxntv.com/posts/post-1/cve-2024-6636/</guid>
-      <description>Introduction One day, an anonymous brother asked me, &amp;ldquo;Are you interested in finding WordPress bugs?&amp;rdquo; And that&amp;rsquo;s how this CVE came to be.&#xA;The &amp;ldquo;WooCommerce - Social Login&amp;rdquo; plugin for WordPress at version &amp;lt;= 2.7.3 is vulnerable to the ability to create new users with an &amp;ldquo;Administrator&amp;rdquo; role. Specifically, if the register function is enabled. In that case, the newly created user will have the default role(Subscriber), but any user without authentication(unauthenticated) can change this default role to any value including &amp;ldquo;Administrator&amp;rdquo;.</description>
+      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;One day, an anonymous brother asked me, &amp;ldquo;Are you interested in finding WordPress bugs?&amp;rdquo; And that&amp;rsquo;s how this CVE came to be.&lt;/p&gt;&#xA;&lt;p&gt;The &amp;ldquo;WooCommerce - Social Login&amp;rdquo; plugin for WordPress at version &amp;lt;= 2.7.3 is vulnerable to the ability to create new users with an &amp;ldquo;Administrator&amp;rdquo; role. Specifically,  if the register function is enabled. In that case, the newly created user will have the default role(Subscriber),  but any user without authentication(unauthenticated) can change this default role to any value including &amp;ldquo;Administrator&amp;rdquo;. From there, can create a new user with &amp;ldquo;Administrator&amp;rdquo; rights with this plugin&amp;rsquo;s account registration function.&lt;/p&gt;</description>
     </item>
     <item>
       <title></title>
       <link>https://blog.maxntv.com/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://blog.maxntv.com/about/</guid>
-      <description>sadfasdfsdf</description>
+      <description>&lt;p&gt;sadfasdfsdf&lt;/p&gt;</description>
     </item>
     <item>
       <title>Contact</title>
       <link>https://blog.maxntv.com/contact/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://blog.maxntv.com/contact/</guid>
-      <description> Email: maxntv24@gmail.com Website: https://maxntv.com Github: https://github.com/maxntv24 Wordfence: https://www.wordfence.com/threat-intel/vulnerabilities/researchers/vu-nguyen YesWeHack: https://yeswehack.com/hunters/maxntv </description>
+      <description>&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;Email:&lt;/strong&gt; &lt;a href=&#34;mailto:maxntv24@gmail.com&#34;&gt;maxntv24@gmail.com&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Website:&lt;/strong&gt; &lt;a href=&#34;https://maxntv.com&#34;&gt;https://maxntv.com&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Github:&lt;/strong&gt; &lt;a href=&#34;https://github.com/maxntv24&#34;&gt;https://github.com/maxntv24&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Wordfence:&lt;/strong&gt; &lt;a href=&#34;https://www.wordfence.com/threat-intel/vulnerabilities/researchers/vu-nguyen&#34;&gt;https://www.wordfence.com/threat-intel/vulnerabilities/researchers/vu-nguyen&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;YesWeHack:&lt;/strong&gt; &lt;a href=&#34;https://yeswehack.com/hunters/maxntv&#34;&gt;https://yeswehack.com/hunters/maxntv&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
   </channel>
 </rss>
