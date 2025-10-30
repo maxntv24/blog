@@ -46,7 +46,7 @@
   lang="en-us"
   dir="ltr"
 >
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta
@@ -78,14 +78,14 @@ Use SQL injection to bypass the verify/updatedAt checks so user leet becomes sel
   
   
   
-  <link rel="preload stylesheet" as="style" href="http://localhost:1313/main.min.css" />
+  <link rel="preload stylesheet" as="style" href="https://blog.maxntv.com/main.min.css" />
 
   
   
   
   
   
-  <link rel="preload" as="image" href="http://localhost:1313/theme.png" />
+  <link rel="preload" as="image" href="https://blog.maxntv.com/theme.png" />
 
   
   
@@ -97,7 +97,7 @@ Use SQL injection to bypass the verify/updatedAt checks so user leet becomes sel
 
   
   
-  <link rel="preload" as="image" href="http://localhost:1313/github.svg" />
+  <link rel="preload" as="image" href="https://blog.maxntv.com/github.svg" />
   
   
 
@@ -105,7 +105,7 @@ Use SQL injection to bypass the verify/updatedAt checks so user leet becomes sel
   
   <script
     defer
-    src="http://localhost:1313/highlight.min.js"
+    src="https://blog.maxntv.com/highlight.min.js"
     onload="hljs.initHighlightingOnLoad();"
   ></script>
   
@@ -117,11 +117,11 @@ Use SQL injection to bypass the verify/updatedAt checks so user leet becomes sel
   
   <link
     rel="icon"
-    href="http://localhost:1313/favicon.ico"
+    href="https://blog.maxntv.com/favicon.ico"
   />
   <link
     rel="apple-touch-icon"
-    href="http://localhost:1313/apple-touch-icon.png"
+    href="https://blog.maxntv.com/apple-touch-icon.png"
   />
 
   
@@ -130,12 +130,50 @@ Use SQL injection to bypass the verify/updatedAt checks so user leet becomes sel
   
   
   
+  
+  
+  
+  <meta itemprop="name" content="Chainfection Write Up - Yeswehack Dojo 45">
+  <meta itemprop="description" content="Summary Chained vulnerability: an SQL injection is used to bypass the verify/date checks, then a path-traversal/file-write lets the attacker place malicious content into /tmp/view/index.ejs; when the app renders that template, the injected code executes, resulting in RCE.
+A successful attack causes code execution, leading to the compromise of the server exposing sensitive/confidential data.
+Exploitation Use SQL injection to bypass the verify/updatedAt checks so user leet becomes selectable, update that user\u2019s attachment and write attacker-controlled content which resolves to /tmp/view/index.ejs, then trigger the template render to execute the injected code and achieve RCE.">
+  <meta itemprop="datePublished" content="2025-10-30T19:42:21+07:00">
+  <meta itemprop="dateModified" content="2025-10-30T19:42:21+07:00">
+  <meta itemprop="wordCount" content="1183">
+  
+  <meta property="og:url" content="https://blog.maxntv.com/posts/post-3/chainfection/">
+  <meta property="og:site_name" content="Blog of MaxNTV(aka vu.nguyen)">
+  <meta property="og:title" content="Chainfection Write Up - Yeswehack Dojo 45">
+  <meta property="og:description" content="Summary Chained vulnerability: an SQL injection is used to bypass the verify/date checks, then a path-traversal/file-write lets the attacker place malicious content into /tmp/view/index.ejs; when the app renders that template, the injected code executes, resulting in RCE.
+A successful attack causes code execution, leading to the compromise of the server exposing sensitive/confidential data.
+Exploitation Use SQL injection to bypass the verify/updatedAt checks so user leet becomes selectable, update that user\u2019s attachment and write attacker-controlled content which resolves to /tmp/view/index.ejs, then trigger the template render to execute the injected code and achieve RCE.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-10-30T19:42:21+07:00">
+    <meta property="article:modified_time" content="2025-10-30T19:42:21+07:00">
+
+  
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Chainfection Write Up - Yeswehack Dojo 45">
+  <meta name="twitter:description" content="Summary Chained vulnerability: an SQL injection is used to bypass the verify/date checks, then a path-traversal/file-write lets the attacker place malicious content into /tmp/view/index.ejs; when the app renders that template, the injected code executes, resulting in RCE.
+A successful attack causes code execution, leading to the compromise of the server exposing sensitive/confidential data.
+Exploitation Use SQL injection to bypass the verify/updatedAt checks so user leet becomes selectable, update that user\u2019s attachment and write attacker-controlled content which resolves to /tmp/view/index.ejs, then trigger the template render to execute the injected code and achieve RCE.">
+
+  
+  
+
+  
+  <link rel="canonical" href="https://blog.maxntv.com/posts/post-3/chainfection/" />
+  
+  
 </head>
 
   <body class="text-black duration-200 ease-out dark:text-white">
     <header class="mx-auto flex h-[4.5rem] max-w-[--w] px-8 lg:justify-center">
   <div class="relative z-50 ltr:mr-auto rtl:ml-auto flex items-center">
-    <a class="-translate-y-[1px] text-2xl font-medium" href="http://localhost:1313/"
+    <a class="-translate-y-[1px] text-2xl font-medium" href="https://blog.maxntv.com/"
       >Blog of MaxNTV(aka vu.nguyen)</a
     >
     <div
@@ -477,7 +515,7 @@ Ref: <a href="https://github.com/cabraviva/path-sanitizer/commit/bb2e758">The co
   >
     
     
-    <a class="ltr:ml-auto rtl:mr-auto justify-end pl-3" href="http://localhost:1313/posts/post-2/svn/"
+    <a class="ltr:ml-auto rtl:mr-auto justify-end pl-3" href="https://blog.maxntv.com/posts/post-2/svn/"
       ><span>Just use Dirsearch to get Critical Bug</span><span class="ltr:ml-1.5 rtl:mr-1.5">→</span></a
     >
     
@@ -506,7 +544,7 @@ Ref: <a href="https://github.com/cabraviva/path-sanitizer/commit/bb2e758">The co
   <div class="mr-auto">
   
     &copy; 2025
-    <a class="link" href="http://localhost:1313/">Blog of MaxNTV(aka vu.nguyen)</a>
+    <a class="link" href="https://blog.maxntv.com/">Blog of MaxNTV(aka vu.nguyen)</a>
   
   </div>
   <a class="link mx-6" href="https://gohugo.io/" rel="noopener" target="_blank"
